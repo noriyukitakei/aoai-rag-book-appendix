@@ -1,0 +1,8 @@
+##########
+Azure OpenAI ServiceによるRAG構築
+##########
+
+.. toctree::
+    :maxdepth: 2
+    
+    ./source/chapter01/ch01-evaluterag

@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Prompt Flow における評価手順 &#8212; Azure OpenAI ServiceによるRAG構築  ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="../../_static/documentation_options.js?v=c033477b"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="canonical" href="https://example.com/source/chapter01/ch01-evaluterag.html" />
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="prev" title="Azure OpenAI ServiceによるRAG構築" href="../../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../../index.html" title="Azure OpenAI ServiceによるRAG構築"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Azure OpenAI ServiceによるRAG構築  ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Prompt Flow における評価手順</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="prompt-flow">
+<h1>Prompt Flow における評価手順<a class="headerlink" href="#prompt-flow" title="Link to this heading">¶</a></h1>
+<p>Prompt Flow を使用して RAG の評価を行う手順は以下の通りです。</p>
+<section id="id1">
+<h2>正解データセットを作成する<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>質問と Ground Truth(期待される回答)を作成します。以下のように CSV 形式で作成し、質問は「question」のフィールドに、Ground Truth(期待される回答)は「ground_truth」のフィールドに定義します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;query&quot;</span><span class="p">,</span><span class="s2">&quot;response&quot;</span><span class="p">,</span><span class="s2">&quot;context&quot;</span><span class="p">,</span><span class="s2">&quot;ground_truth&quot;</span>
+<span class="s2">&quot;一日の労働上限時間は？&quot;</span><span class="p">,</span><span class="s2">&quot;一日の労働時間の上限は8時間です。&quot;</span><span class="p">,</span><span class="s2">&quot;[&#39;[Source20]: す。）は、１週４４時間まで働かせることが認められています...(略)&quot;</span><span class="p">,</span><span class="s2">&quot;8時間です&quot;</span>
+<span class="s2">&quot;有給は何日取得できますか？&quot;</span><span class="p">,</span> <span class="s2">&quot;最低10日の有給休暇が与えられます。&quot;</span><span class="p">,</span><span class="s2">&quot;[&#39;[Source38]: 有給休暇の取得方法について...(略)&quot;</span><span class="p">,</span> <span class="s2">&quot;20日です&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="azure-ai-foundry">
+<h2>Azure AI Foundry にアクセスする<a class="headerlink" href="#azure-ai-foundry" title="Link to this heading">¶</a></h2>
+<p>Azure AI Foundryのポータルにアクセスします。
+https://ai.azure.com/</p>
+</section>
+<section id="id2">
+<h2>Azure AI Foundryのリソース作成画面を開く<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>「新規作成」をクリックして、Azure AI Foundryのリソース作成画面を開きます。</p>
+<p><img alt="" src="../../_images/ch01-001.png" />
+<strong>▲ 図1-1： Azure AI Foundryのリソース作成画面を開く</strong></p>
+</section>
+<section id="id3">
+<h2>リソースの種類を選択する<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>「Azure AI Foundryリソース」を選択します(①)、「作成」をクリックします(②)。</p>
+<p><img alt="" src="../../_images/ch01-002.png" />
+<strong>▲ 図1-2： Azure AI Foundryリソースの種類を選択する</strong></p>
+</section>
+<section id="id4">
+<h2>プロジェクト名を入力する<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>プロジェクト名を入力します(①)。プロジェクト名は任意の名前を付けることができますが、わかりやすい名前を付けることをお勧めします。次に、「作成」をクリックします(②)。</p>
+<p><img alt="" src="../../_images/ch01-003.png" />
+<strong>▲ 図1-3： プロジェクト名を入力する</strong></p>
+</section>
+<section id="id5">
+<h2>モデルのデプロイ画面を開く<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>左部メニューから「モデル+エンドポイント」(①)→「モデルのデプロイ」(②)→「基本モデルをデプロイする」(③)の順にクリックして、モデルのデプロイ画面を開きます。</p>
+<p><img alt="" src="../../_images/ch01-004.png" />
+<strong>▲ 図1-4： モデルのデプロイ画面を開く</strong></p>
+</section>
+<section id="id6">
+<h2>モデルを選択する<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>「チャットの完了」と表示されている任意のモデルを選択して(①)、「次へ」をクリックします(②)。</p>
+<p><img alt="" src="../../_images/ch01-005.png" />
+<strong>▲ 図1-4： モデルを選択する</strong></p>
+</section>
+<section id="id7">
+<h2>モデルをデプロイする<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p>「デプロイ」をクリックして、モデルをデプロイします。</p>
+<p><img alt="" src="../../_images/ch01-006.png" />
+<strong>▲ 図1-6： モデルをデプロイする</strong></p>
+</section>
+<section id="id8">
+<h2>評価の画面を表示する<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p>「評価」(①)→「新しい評価を作成する」(②)の順にクリックします。</p>
+<p><img alt="" src="../../_images/ch01-007.png" />
+<strong>▲ 図1-7： 新しい評価を作成する</strong></p>
+</section>
+<section id="id9">
+<h2>評価対象を選択する<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<p>評価対象を選択します。「既存のクエリ応答データセットを評価する」を選択します(①)。次に、「次へ」をクリックします(②)。</p>
+<p><img alt="" src="../../_images/ch01-008.png" />
+<strong>▲ 図1-8： 既存のクエリ応答データセットを評価する</strong></p>
+</section>
+<section id="id10">
+<h2>新しいデータセットをアップロードする<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<p>「新しいデータセットをアップロードする」をクリックします。ファイル選択画面が表示されるので、冒頭の「正解データセットを作成する」で作成した正解データセットを選択します。</p>
+<p><img alt="" src="../../_images/ch01-009.png" />
+<strong>▲ 図1-9： 新しいデータセットをアップロードする</strong></p>
+</section>
+<section id="id11">
+<h2>テスト条件を選択する画面を表示する<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<p>プレビューに①のように表示されていることを確認して、「次へ」(②)をクリックします。</p>
+<p><img alt="" src="../../_images/ch01-010.png" />
+<strong>▲ 図1-10： テスト条件を選択する画面</strong></p>
+</section>
+<section id="id12">
+<h2>エバリューター選択画面を表示する<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<p>エバリューター選択画面を表示するために、「+追加」をクリックします。</p>
+<p><img alt="" src="../../_images/ch01-011.png" />
+<strong>▲ 図1-11： テスト条件を追加する画面</strong></p>
+</section>
+<section id="id13">
+<h2>エバリューターを選択する<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<p>「リッカート尺度エバリューター」をクリックします。</p>
+<p><img alt="" src="../../_images/ch01-012.png" />
+<strong>▲ 図1-12： エバリューターを選択する画面</strong></p>
+</section>
+<section id="id14">
+<h2>エバリューター(根拠性)を追加する<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<p>評価指標の一つである「根拠性」を追加します。以下のように設定して、「追加」をクリックします。</p>
+<ul class="simple">
+<li><p>抽出条件の名前: groundness</p></li>
+<li><p>プリセット: 根拠性</p></li>
+<li><p>評価結果: 先ほど作成したデプロイ</p></li>
+<li><p>コンテキスト: {{item.context}}</p></li>
+<li><p>クエリ: {{item.query}}</p></li>
+<li><p>応答: {{item.response}}</p></li>
+<li><p>成績が合格: 1〜5までで任意の値(5段階評価の中で合格とする値)</p></li>
+</ul>
+<p><img alt="" src="../../_images/ch01-013.png" />
+<strong>▲ 図1-13： エバリューター(根拠性)を追加する画面</strong></p>
+</section>
+<section id="id15">
+<h2>エバリューター(関連度)を追加する<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h2>
+<p>同様の手順で、「関連度」の指標を追加します。以下のように設定して、「追加」をクリックします。</p>
+<ul class="simple">
+<li><p>抽出条件の名前: relevance</p></li>
+<li><p>プリセット: 関連度</p></li>
+<li><p>評価結果: 先ほど作成したデプロイ</p></li>
+<li><p>クエリ: {{item.query}}</p></li>
+<li><p>応答: {{item.response}}</p></li>
+<li><p>成績が合格: 1〜5までで任意の値(5段階評価の中で合格とする値)</p></li>
+</ul>
+<p><img alt="" src="../../_images/ch01-014.png" />
+<strong>▲ 図1-13： エバリューター(関連度)を追加する画面</strong></p>
+</section>
+<section id="id16">
+<h2>エバリューター(コヒーレンス)を追加する<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
+<p>同様の手順で、「コヒーレンス」の指標を追加します。以下のように設定して、「追加」をクリックします。</p>
+<ul class="simple">
+<li><p>抽出条件の名前: coherence</p></li>
+<li><p>プリセット: コヒーレンス</p></li>
+<li><p>評価結果: 先ほど作成したデプロイ</p></li>
+<li><p>クエリ: {{item.query}}</p></li>
+<li><p>応答: {{item.response}}</p></li>
+<li><p>成績が合格: 1〜5までで任意の値(5段階評価の中で合格とする値)</p></li>
+</ul>
+<p><img alt="" src="../../_images/ch01-015.png" />
+<strong>▲ 図1-15： エバリューター(コヒーレンス)を追加する画面</strong></p>
+</section>
+<section id="id17">
+<h2>エバリューター(流暢性)を追加する<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<p>同様の手順で、「流暢性」の指標を追加します。以下のように設定して、「追加」をクリックします。</p>
+<ul class="simple">
+<li><p>抽出条件の名前: fluency</p></li>
+<li><p>プリセット: 流暢性</p></li>
+<li><p>評価結果: 先ほど作成したデプロイ</p></li>
+<li><p>クエリ: {{item.query}}</p></li>
+<li><p>応答: {{item.response}}</p></li>
+<li><p>成績が合格: 1〜5までで任意の値(5段階評価の中で合格とする値)</p></li>
+</ul>
+<p><img alt="" src="../../_images/ch01-016.png" />
+<strong>▲ 図1-16： エバリューター(流暢性)を追加する画面</strong></p>
+</section>
+<section id="id18">
+<h2>エバリューター(類似性)を追加する<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h2>
+<p>同様の手順で、「類似性」の指標を追加します。以下のように設定して、「追加」をクリックします。</p>
+<ul class="simple">
+<li><p>抽出条件の名前: similarity</p></li>
+<li><p>プリセット: 類似性</p></li>
+<li><p>評価結果: 先ほど作成したデプロイ</p></li>
+<li><p>クエリ: {{item.query}}</p></li>
+<li><p>グラウンドトルース: {{item.ground_truth}}</p></li>
+<li><p>応答: {{item.response}}</p></li>
+<li><p>成績が合格: 1〜5までで任意の値(5段階評価の中で合格とする値)</p></li>
+</ul>
+<p><img alt="" src="../../_images/ch01-017.png" />
+<strong>▲ 図1-17： エバリューター(類似性)を追加する画面</strong></p>
+</section>
+<section id="id19">
+<h2>送信画面を表示する<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<p>１評価指標が追加されたことを確認し(①)、「次へ」(②)をクリックします。</p>
+<p><img alt="" src="../../_images/ch01-018.png" />
+<strong>▲ 図1-18： 送信画面を表示する</strong></p>
+</section>
+<section id="id20">
+<h2>評価を行う<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h2>
+<p>「送信」をクリックして、評価を行います。</p>
+<p><img alt="" src="../../_images/ch01-019.png" />
+<strong>▲ 図1-19： 評価を行う</strong></p>
+</section>
+<section id="id21">
+<h2>評価結果を確認する<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<p>評価が完了すると、結果が表示されます。「状態」が「完了」になっていれば評価が完了しています(①)。次に、「データ」(②)をクリックします。</p>
+<p><img alt="" src="../../_images/ch01-020.png" />
+<strong>▲ 図1-20： 評価結果を確認する</strong></p>
+</section>
+<section id="id22">
+<h2>評価結果の詳細を確認する<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h2>
+<p>評価結果の詳細が表示されます。各評価指標の詳細を確認することができます。「Passed」は合格、「Fail」は不合格を示しています。先ほど設定した「成績が合格」の値に基づいて評価が行われ、その値以上であれば「Passed」、それ未満であれば「Fail」となります。</p>
+<p><img alt="" src="../../_images/ch01-021.png" />
+<strong>▲ 図1-21： 評価結果の詳細を確認する</strong></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Prompt Flow における評価手順</a><ul>
+<li><a class="reference internal" href="#id1">正解データセットを作成する</a></li>
+<li><a class="reference internal" href="#azure-ai-foundry">Azure AI Foundry にアクセスする</a></li>
+<li><a class="reference internal" href="#id2">Azure AI Foundryのリソース作成画面を開く</a></li>
+<li><a class="reference internal" href="#id3">リソースの種類を選択する</a></li>
+<li><a class="reference internal" href="#id4">プロジェクト名を入力する</a></li>
+<li><a class="reference internal" href="#id5">モデルのデプロイ画面を開く</a></li>
+<li><a class="reference internal" href="#id6">モデルを選択する</a></li>
+<li><a class="reference internal" href="#id7">モデルをデプロイする</a></li>
+<li><a class="reference internal" href="#id8">評価の画面を表示する</a></li>
+<li><a class="reference internal" href="#id9">評価対象を選択する</a></li>
+<li><a class="reference internal" href="#id10">新しいデータセットをアップロードする</a></li>
+<li><a class="reference internal" href="#id11">テスト条件を選択する画面を表示する</a></li>
+<li><a class="reference internal" href="#id12">エバリューター選択画面を表示する</a></li>
+<li><a class="reference internal" href="#id13">エバリューターを選択する</a></li>
+<li><a class="reference internal" href="#id14">エバリューター(根拠性)を追加する</a></li>
+<li><a class="reference internal" href="#id15">エバリューター(関連度)を追加する</a></li>
+<li><a class="reference internal" href="#id16">エバリューター(コヒーレンス)を追加する</a></li>
+<li><a class="reference internal" href="#id17">エバリューター(流暢性)を追加する</a></li>
+<li><a class="reference internal" href="#id18">エバリューター(類似性)を追加する</a></li>
+<li><a class="reference internal" href="#id19">送信画面を表示する</a></li>
+<li><a class="reference internal" href="#id20">評価を行う</a></li>
+<li><a class="reference internal" href="#id21">評価結果を確認する</a></li>
+<li><a class="reference internal" href="#id22">評価結果の詳細を確認する</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../../index.html"
+                          title="前の章へ">Azure OpenAI ServiceによるRAG構築</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/source/chapter01/ch01-evaluterag.md.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../../index.html" title="Azure OpenAI ServiceによるRAG構築"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Azure OpenAI ServiceによるRAG構築  ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Prompt Flow における評価手順</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; 著作権 .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

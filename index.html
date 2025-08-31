@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Azure OpenAI ServiceによるRAG構築 &#8212; Azure OpenAI ServiceによるRAG構築  ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=c033477b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=4755f45a"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="canonical" href="https://example.com/index.html" />
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" />
+    <link rel="next" title="Prompt Flow における評価手順" href="source/chapter01/ch01-evaluterag.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="source/chapter01/ch01-evaluterag.html" title="Prompt Flow における評価手順"
+             accesskey="N">次へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Azure OpenAI ServiceによるRAG構築  ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Azure OpenAI ServiceによるRAG構築</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="azure-openai-servicerag">
+<h1>Azure OpenAI ServiceによるRAG構築<a class="headerlink" href="#azure-openai-servicerag" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html">Prompt Flow における評価手順</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id1">正解データセットを作成する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#azure-ai-foundry">Azure AI Foundry にアクセスする</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id2">Azure AI Foundryのリソース作成画面を開く</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id3">リソースの種類を選択する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id4">プロジェクト名を入力する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id5">モデルのデプロイ画面を開く</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id6">モデルを選択する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id7">モデルをデプロイする</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id8">評価の画面を表示する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id9">評価対象を選択する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id10">新しいデータセットをアップロードする</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id11">テスト条件を選択する画面を表示する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id12">エバリューター選択画面を表示する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id13">エバリューターを選択する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id14">エバリューター(根拠性)を追加する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id15">エバリューター(関連度)を追加する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id16">エバリューター(コヒーレンス)を追加する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id17">エバリューター(流暢性)を追加する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id18">エバリューター(類似性)を追加する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id19">送信画面を表示する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id20">評価を行う</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id21">評価結果を確認する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/chapter01/ch01-evaluterag.html#id22">評価結果の詳細を確認する</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="source/chapter01/ch01-evaluterag.html"
+                          title="次の章へ">Prompt Flow における評価手順</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="source/chapter01/ch01-evaluterag.html" title="Prompt Flow における評価手順"
+             >次へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Azure OpenAI ServiceによるRAG構築  ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Azure OpenAI ServiceによるRAG構築</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; 著作権 .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
